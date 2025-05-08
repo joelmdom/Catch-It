@@ -10,7 +10,7 @@ En la creación de este proyecto, destacan los siguientes retos técnicos:
 ## Instalación
 
 > [!TIP]
-> Puedes consultar las librerías que hemos usado para este proyecto en el fichero [requirements.txt](Catch-It/requirements.txt)
+> Puedes consultar las librerías que hemos usado para este proyecto en el fichero [requirements.txt](requirements.txt)
 
 > [!CAUTION]
 > He cambiado enrutamientos de archivos 
@@ -50,9 +50,9 @@ El modelo 3D del brazo robótico no nos pertenece, lo puedes conseguir aquí en 
 
 Puedes acceder a una descripción más detallada de cada módulo en sus directorios:
 
-- [Image Processing](Catch-It/ImageProcessingModule/README.md)
-- [Movement](Catch-It/MovementModule/README.md)
-- [User Interface](Catch-It/UserInterfaceModule/README.md)
+- [Image Processing](ImageProcessingModule/README.md)
+- [Movement](MovementModule/README.md)
+- [User Interface](UserInterfaceModule/README.md)
 
 
 
