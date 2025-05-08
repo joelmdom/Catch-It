@@ -1,4 +1,0 @@
-services:
-  catch-it:
-    image: catch-it
-    restart: unless-stopped  # para que arranque con el sistema, se reinicie automaticamente si peta el codigo.
