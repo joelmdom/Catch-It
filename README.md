@@ -51,11 +51,9 @@ El modelo 3D del brazo robótico no nos pertenece, lo puedes conseguir aquí en 
 
 Puedes acceder a una descripción más detallada de cada módulo en sus directorios:
 
-- [Image Processing](ImageProcessingModule/README.md)
-- [Movement](MovementModule/README.md)
-- [User Interface](UserInterfaceModule/README.md)
-
-
+- [Image Processing](ImageProcessingModule/README.md): Módulo destinado a la detección de los bloques mediante el modelo de Ultralytics YOLO. Dentro de este módulo se incluye también el preprocesamiento de las imágenes captadas por la cámara, con la finalidad de normalizarlas y obtener un mejor reconocimiento, y la detección de su posición 3D mediante un algoritmo de Depth Estimation.
+- [Movement](MovementModule/README.md): Módulo destinado al cálculo de la trayectoria del robot sin colisiones y al algoritmo de apilamiento, el cual debe tener en cuenta la estabilidad de la torre en tiempo real.
+- [User Interface](UserInterfaceModule/README.md): Aplicación que permita visualizar la retransmisión de la cámara en tiempo real, iniciar y parar el funcionamiento del robot y un modo manual en el que puedas elegir qué pieza quieres que agarre el brazo robótico. 
 
 ## Bibliografía 
 
