@@ -35,7 +35,7 @@ ejecutar en segundo plano
 
 ## Piezas 3D
 
-El modelo 3D del brazo robótico no nos pertenece, lo puedes conseguir aquí en el siguiente link: https://cults3d.com/es/modelo-3d/artilugios/brazo-robotico-arduino-diy-con-control-de-smartphone-2023
+El modelo 3D del brazo robótico no nos pertenece, lo puedes conseguir en el siguiente link: https://cults3d.com/es/modelo-3d/artilugios/brazo-robotico-arduino-diy-con-control-de-smartphone-2023
 
 ## Arquitectura hardware
 
