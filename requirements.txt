@@ -1,0 +1,3 @@
+#picamera
+ultralytics
+opencv-python
