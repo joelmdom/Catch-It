@@ -13,22 +13,11 @@ En la creación de este proyecto, destacan los siguientes retos técnicos:
 > [!TIP]
 > Puedes consultar las librerías que hemos usado para este proyecto en el fichero [requirements.txt](requirements.txt)
 
-> [!CAUTION]
-> He cambiado enrutamientos de archivos 
-
 en la carpeta del programa
 
-compilar
+compilar y ejecutar
 
-```docker build . -t catch-it```
-
-ejecutar en primer plano
-
-```docker-compose up```
-
-ejecutar en segundo plano
-
-```docker-compose up -d```
+```docker build . -t catch-it -f ./Install/Dockerfile && docker-compose -f ./Install/docker-compose.yaml up```
 
 ## Funcionamiento y demostración
 
