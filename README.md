@@ -46,6 +46,7 @@ El modelo 3D del brazo robótico no nos pertenece, lo puedes conseguir en el sig
 
 ## Arquitectura software
 
+![ModulsSoftware drawio](https://github.com/user-attachments/assets/e103d8e5-05aa-42df-9202-fe28135a4068)
 
 ### Descripción de los módulos
 
