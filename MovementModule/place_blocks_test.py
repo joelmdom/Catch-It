@@ -2,6 +2,7 @@
 Programa de prueba: coloca los bloques para hacer la torre. el robot no los coloca simplemente spawnean.
 para probar algoritmos de apilamiento y estabilidad.
 """
+from PIL.ImageChops import offset
 
 from coppelia_functions import *
 import time
@@ -16,9 +17,9 @@ class BuilderModule:
     def spawn_jenga_block(self, x, y, z, orientation_gamma):
         # copy paste block
         _, block = sim.simxGetObjectHandle(self.clientID, "Cuboid53", sim.simx_opmode_blocking)
-        print(block)
+        # print(block)
         _, ret = sim.simxCopyPasteObjects(self.clientID, [block], sim.simx_opmode_blocking)
-        print(block)
+        # print(block)
         block = ret[0]
         sim.simxSetObjectOrientation(self.clientID, block, block, [0,0,radians(orientation_gamma)], sim.simx_opmode_blocking)
         sim.simxSetObjectPosition(self.clientID, block, -1, [x, y, z], sim.simx_opmode_blocking)
@@ -41,7 +42,7 @@ class BuilderModule:
         levels = int(levels)
         print(levels)
         x,y,z = center
-        z += 0.01 # para dejarla caer un poco y desequilibrar
+        z += 0.1 # para dejarla caer un poco y desequilibrar
 
         for level in range(levels):
             # self.build_tower_level_even(x, y, z)
@@ -51,12 +52,33 @@ class BuilderModule:
                 self.build_tower_level_odd(x,y,z)
             z += 0.015
 
+    def build_block_stacking_problem(self, center):
+        """
+        https://en.wikipedia.org/wiki/Block-stacking_problem
+        """
+        block_size = [0.075, 0.025, 0.015]
+
+        levels = 9
+        x, y, z = center
+        z += 0.01  # para dejarla caer un poco y desequilibrar
+        self.spawn_jenga_block(x, y, z, 0)
+        z += 0.015
+        time.sleep(2)
+        for level in reversed(range(levels)):
+            x_offset = block_size[0]/(2*(level+1))
+            print(x_offset)
+            self.spawn_jenga_block(x + x_offset, y, z, 0)
+            z+= 0.015
+            time.sleep(2)
+
+
+
 
 if __name__ == '__main__':
     builder = BuilderModule()
     x = -0.3
     y = -0.1
-    z = 0.05
+    z = 0.0
     # for i in range(100):
     #     builder.spawn_jenga_block(x,y,z)
     #     y -= 0.03
@@ -64,3 +86,5 @@ if __name__ == '__main__':
 
     # builder.build_tower_level_even(x,y,z)
     builder.build_tower(30, [x,y,z])
+    # builder.build_tower(300, [x,y,z])
+    # builder.build_block_stacking_problem([x,y,z])
