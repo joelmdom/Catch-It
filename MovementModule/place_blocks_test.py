@@ -60,7 +60,7 @@ class BuilderModule:
 
         levels = 9
         x, y, z = center
-        z += 0.01  # para dejarla caer un poco y desequilibrar
+        z += 0.1  # para dejarla caer un poco y desequilibrar
         self.spawn_jenga_block(x, y, z, 0)
         z += 0.015
         time.sleep(2)
@@ -76,7 +76,7 @@ class BuilderModule:
 
 if __name__ == '__main__':
     builder = BuilderModule()
-    x = -0.3
+    x = 0.1
     y = -0.1
     z = 0.0
     # for i in range(100):
