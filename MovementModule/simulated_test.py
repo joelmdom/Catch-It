@@ -2,8 +2,11 @@
 Programa de prueba: mover todos los motores del brazo en coppelia. Abrir y cerrar pinza. Falta inverse kinematics!!!
 """
 
-# funciones del coppelia
 import sim
+import time
+from math import radians
+
+# funciones del coppelia
 def coppelia_connect(port):
     sim.simxFinish(-1) # just in case, close all opened connections
     clientID=sim.simxStart('127.0.0.1',port,True,True,2000,5) # Connect
@@ -30,15 +33,36 @@ class MovementModule():
         retCode, self.m6_l = sim.simxGetObjectHandle(self.clientID, 'joint6_l', sim.simx_opmode_blocking)
         retCode, self.m6_r = sim.simxGetObjectHandle(self.clientID, 'joint6_r', sim.simx_opmode_blocking)
 
-    def move(self):
-        # sim.simxSetJointTargetPosition(self.clientID, self.m1, 40, sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m2, 40, sim.simx_opmode_blocking)
-        # sim.simxSetJointTargetPosition(self.clientID, self.m3, 40, sim.simx_opmode_blocking)
-        # sim.simxSetJointTargetPosition(self.clientID, self.m4, 40, sim.simx_opmode_blocking)
-        # sim.simxSetJointTargetPosition(self.clientID, self.m5, 40, sim.simx_opmode_blocking)
-        # sim.simxSetJointTargetPosition(self.clientID, self.m6, 0, sim.simx_opmode_blocking)
+    def reset(self):
+        sim.simxSetJointTargetPosition(self.clientID, self.m1, 0, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m2, 0, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m3, 0, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m4, 0, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m5, 0, sim.simx_opmode_blocking)
+        self.close_claw()
 
+    def move(self):
+        sim.simxSetJointTargetPosition(self.clientID, self.m1, 10, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m2, 10, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m3, 10, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m4, 10, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m5, 10, sim.simx_opmode_blocking)
+        self.close_claw()
+
+    def open_claw(self):
+        sim.simxSetJointTargetPosition(self.clientID, self.m6_l, radians(30), sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m6_r, radians(-30), sim.simx_opmode_blocking)
+
+    def close_claw(self):
+        sim.simxSetJointTargetPosition(self.clientID, self.m6_l, radians(0), sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m6_r, radians(0), sim.simx_opmode_blocking)
 
 if __name__ == '__main__':
     movement = MovementModule()
+    movement.reset()
+    time.sleep(1)
+    movement.open_claw()
+    time.sleep(1)
+    movement.close_claw()
+    time.sleep(1)
     movement.move()
