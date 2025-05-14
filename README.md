@@ -2,7 +2,7 @@
 
 ## Descripción del proyecto
 
-Nuestro brazo robótico **CatchIt!** es un robot de cuatro ejes con garra diseñado para tareas de *pick and place*. La principal funcionalidad de este robot consiste en un reconocimiento en tiempo real de bloques rectangulares de madera, cálculo de su posición exacta, recoger el cubo más accesible, y colocarlo formando la torre de jenga. 
+Nuestro brazo robótico **CatchIt!** es un robot de cinco ejes con garra diseñado para tareas de *pick and place*. La principal funcionalidad de este robot consiste en un reconocimiento en tiempo real de bloques rectangulares de madera, cálculo de su posición exacta, recoger el cubo más accesible, y colocarlo formando la torre de jenga. 
 
 En la creación de este proyecto, destacan los siguientes retos técnicos:
 - **Cálculo de profundidad**: Usando una cámara 2D, conseguir estimar las posiciones tridimensionales de los bloques.
