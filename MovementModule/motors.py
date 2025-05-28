@@ -15,14 +15,18 @@ class MotorsModule:
         for i in range(16):
             self.servos.append( servo.Servo(pca.channels[i]))
 
-    def test(self):
+    def test(self, id):
         # We sleep in the loops to give the servo time to move into position.
         for i in range(180):
-            self.servos[15].angle = i
+            self.servos[id].angle = i
             time.sleep(0.03)
         for i in range(180):
-            self.servos[15].angle = 180 - i
+            self.servos[id].angle = 180 - i
             time.sleep(0.03)
+
+    def test_all(self):
+        for id in [0,3,6,9,12,15]:
+            self.test(id)
 
     def SetServoTargetDegrees(self, servo_i, degrees):
         self.servos[servo_i].angle = degrees
@@ -38,7 +42,8 @@ class MotorsModule:
 
 if __name__ == '__main__':
     motors = MotorsModule()
-    motors.open_claw()
-    motors.close_claw()
-    motors.test()
+    #motors.open_claw()
+    #motors.close_claw()
+    #motors.test()
+    motors.test_all()
 
