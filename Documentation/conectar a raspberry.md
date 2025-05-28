@@ -35,3 +35,25 @@ para descargar los ultimos cambios del repositorio de github:
 1. ir a la carpeta de la repo `cd ~/Catch-It`
 2. `git pull`
 3. nos pedirá un nombre de usuario y la contraseña. el nombre de usuario es el vuestro de github y la contraseña es un token que teneis que crear aquí https://github.com/settings/tokens
+
+## Código pruebas de motores
+
+```commandline
+cd ~/pruebas-motores
+
+# activar el virtual environment con las librerias de motores
+source .venv/bin/activate 
+
+python3 main2.py
+
+# al acabar desactivar el env para que no tengamos problemas de librerias en otros programas que ejecutemos despues
+deactivate
+```
+
+## Código prueba camara
+
+```commandline
+cd ~/Catch-It/UserInterfaceModule/CameraWebTest
+
+pyhton3 main.py
+```
