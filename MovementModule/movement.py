@@ -59,11 +59,17 @@ class MovementModule():
         import numpy as np
         import math
 
-        # Dimensiones de los brazos
-        H = 0.2  # altura de base mm LINK0
-        b = 0.3  # longitud de brazo m  LINK1
-        ab = 0.16  # longitud de antebrazo  LINK2
-        m = 0.24  # longitud de muñequilla m LINK3+LINK4+PINZA - dimension hasta el dummy de la pinza
+        # Dimensiones de los brazos (ejemplo)
+        # H = 0.2  # altura de base mm LINK0
+        # b = 0.3  # longitud de brazo m  LINK1
+        # ab = 0.16  # longitud de antebrazo  LINK2
+        # m = 0.24  # longitud de muñequilla m LINK3+LINK4+PINZA - dimension hasta el dummy de la pinza
+
+        # Dimensiones de los brazos (coppelia nuestro)
+        H = 0.07+0.07 # altura base + altura eje central
+        ab = 0.1
+        b = 0.1
+        m = 0.05
 
         # Colocamos cabeceo y giro de la pinza a 0 grados inicialmente
         cabGrados = 0  # cabeceo de la pinza Joint3
@@ -94,13 +100,26 @@ class MovementModule():
         j3 = 180 - Axis3 * 180 / np.pi
         j4 = 180 - Axis4 * 180 / np.pi
         j5 = Axis5  # joint5  Se ha dado en grados inicialmente
-        print(j1, j2, j3, j4, j5)
+        # print(j1, j2, j3, j4, j5)
+
+        print(f"Joint 1 at {j1} degrees")
+        print(f"Joint 2 at {j2} degrees")
+        print(f"Joint 3 at {j3} degrees")
+        print(f"Joint 4 at {j4} degrees")
+        print(f"Joint 5 at {j5} degrees")
 
         self.move_joint(1, j1 * np.pi / 180)
+        time.sleep(1)
         self.move_joint(2, j2 * np.pi / 180)
+        time.sleep(1)
         self.move_joint(3, j3 * np.pi / 180)
-        self.move_joint(4, j4 * np.pi / 180)
-        self.move_joint(5, j5 * np.pi / 180)
+        time.sleep(1)
+
+        # alerta: nuestro joint 4 y 5 estan en el orden invertido respecto al ejemplo.
+        self.move_joint(5, j4 * np.pi / 180)
+        time.sleep(1)
+        self.move_joint(4, j5 * np.pi / 180)
+        time.sleep(1)
 
 if __name__ == '__main__':
     movement = MovementModule()
@@ -109,8 +128,9 @@ if __name__ == '__main__':
     # movement.open_claw()
     # time.sleep(1)
     # movement.close_claw()
-    time.sleep(1)
-    movement.move_arm_to_position(-0.3,0,0.05)
+    # time.sleep(1)
+    # movement.move_arm_to_position(0.3,0,0.520)
+    movement.move_arm_to_position(-0.22,0,0.15)
 
 
 
