@@ -1,6 +1,7 @@
 """
 Programa de prueba: mover todos los motores del brazo en coppelia. Abrir y cerrar pinza. Falta inverse kinematics!!!
 """
+import numpy as np
 
 import sim
 import time
@@ -8,68 +9,39 @@ from math import radians
 
 from coppelia_functions import *
 
-class MovementModule():
+class MovementModule:
     def __init__(self):
-        # conectar a coppelia
-        self.clientID = coppelia_connect(19999)
-        # print(self.clientID)
-
-        # get all servomotors
-        retCode, self.m1 = sim.simxGetObjectHandle(self.clientID, 'joint1', sim.simx_opmode_blocking)
-        retCode, self.m2 = sim.simxGetObjectHandle(self.clientID, 'joint2', sim.simx_opmode_blocking)
-        retCode, self.m3 = sim.simxGetObjectHandle(self.clientID, 'joint3', sim.simx_opmode_blocking)
-        retCode, self.m4 = sim.simxGetObjectHandle(self.clientID, 'joint4', sim.simx_opmode_blocking)
-        retCode, self.m5 = sim.simxGetObjectHandle(self.clientID, 'joint5', sim.simx_opmode_blocking)
-        self.joints = [self.m1, self.m2, self.m3, self.m4, self.m5]
-        # pinza: en el brazo real solo habrá un motor porque va con engranaje y no sé cómo simularlo en coppelia
-        retCode, self.m6_l = sim.simxGetObjectHandle(self.clientID, 'joint6_l', sim.simx_opmode_blocking)
-        retCode, self.m6_r = sim.simxGetObjectHandle(self.clientID, 'joint6_r', sim.simx_opmode_blocking)
+        pass
 
     def reset(self):
-        sim.simxSetJointTargetPosition(self.clientID, self.m1, 0, sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m2, 0, sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m3, 0, sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m4, 0, sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m5, 0, sim.simx_opmode_blocking)
-        self.close_claw()
+        pass
 
     def move_test(self):
-        sim.simxSetJointTargetPosition(self.clientID, self.m1, 10, sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m2, 10, sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m3, 10, sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m4, 10, sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m5, 10, sim.simx_opmode_blocking)
-        self.close_claw()
+        pass
 
     def move_joint(self, joint_id, target):
-        sim.simxSetJointTargetPosition(self.clientID, self.joints[joint_id-1], target, sim.simx_opmode_blocking)
+        pass
 
     def open_claw(self):
-        sim.simxSetJointTargetPosition(self.clientID, self.m6_l, radians(30), sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m6_r, radians(-30), sim.simx_opmode_blocking)
+        pass
 
     def close_claw(self):
-        sim.simxSetJointTargetPosition(self.clientID, self.m6_l, radians(0), sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m6_r, radians(0), sim.simx_opmode_blocking)
+        pass
+
+    def get_arm_dimensions(self):
+        return 0,0,0,0
+
 
     def move_arm_to_position(self,x,y,z):
         """
-        Inverse kinematic movement. Adaptado de sessió 12
+        Inverse kinematic movement. Adaptado de sessió 12.
+        funciona tanto para coppelia como para motores reales si usamos la clase correcta
         """
         import numpy as np
         import math
 
-        # Dimensiones de los brazos (ejemplo)
-        # H = 0.2  # altura de base mm LINK0
-        # b = 0.3  # longitud de brazo m  LINK1
-        # ab = 0.16  # longitud de antebrazo  LINK2
-        # m = 0.24  # longitud de muñequilla m LINK3+LINK4+PINZA - dimension hasta el dummy de la pinza
+        H, ab, b, m = self.get_arm_dimensions()  # sera distinto depende si usamos la clase de sim o real
 
-        # Dimensiones de los brazos (coppelia nuestro)
-        H = 0.07+0.07 # altura base + altura eje central
-        ab = 0.1
-        b = 0.1
-        m = 0.05 + 0.07 # muñeca + pinza
 
         # Colocamos cabeceo y giro de la pinza a 0 grados inicialmente
         cabGrados = 0  # cabeceo de la pinza Joint3
@@ -122,11 +94,108 @@ class MovementModule():
         self.move_joint(2, j2 * np.pi / 180)
         time.sleep(1)
 
+class MovementModuleSim(MovementModule):
+    """
+    clase con todo el codigo especifico para coppelia.
+    """
+    def __init__(self):
+        # conectar a coppelia
+        self.clientID = coppelia_connect(19999)
+        # print(self.clientID)
 
+        # get all servomotors
+        retCode, self.m1 = sim.simxGetObjectHandle(self.clientID, 'joint1', sim.simx_opmode_blocking)
+        retCode, self.m2 = sim.simxGetObjectHandle(self.clientID, 'joint2', sim.simx_opmode_blocking)
+        retCode, self.m3 = sim.simxGetObjectHandle(self.clientID, 'joint3', sim.simx_opmode_blocking)
+        retCode, self.m4 = sim.simxGetObjectHandle(self.clientID, 'joint4', sim.simx_opmode_blocking)
+        retCode, self.m5 = sim.simxGetObjectHandle(self.clientID, 'joint5', sim.simx_opmode_blocking)
+        self.joints = [self.m1, self.m2, self.m3, self.m4, self.m5]
+        # pinza: en el brazo real solo habrá un motor porque va con engranaje y no sé cómo simularlo en coppelia
+        retCode, self.m6_l = sim.simxGetObjectHandle(self.clientID, 'joint6_l', sim.simx_opmode_blocking)
+        retCode, self.m6_r = sim.simxGetObjectHandle(self.clientID, 'joint6_r', sim.simx_opmode_blocking)
 
+    def reset(self):
+        sim.simxSetJointTargetPosition(self.clientID, self.m1, 0, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m2, 0, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m3, 0, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m4, 0, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m5, 0, sim.simx_opmode_blocking)
+        self.close_claw()
+
+    def move_test(self):
+        sim.simxSetJointTargetPosition(self.clientID, self.m1, 10, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m2, 10, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m3, 10, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m4, 10, sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m5, 10, sim.simx_opmode_blocking)
+        self.close_claw()
+
+    def move_joint(self, joint_id, target):
+        sim.simxSetJointTargetPosition(self.clientID, self.joints[joint_id - 1], target, sim.simx_opmode_blocking)
+
+    def open_claw(self):
+        sim.simxSetJointTargetPosition(self.clientID, self.m6_l, radians(30), sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m6_r, radians(-30), sim.simx_opmode_blocking)
+
+    def close_claw(self):
+        sim.simxSetJointTargetPosition(self.clientID, self.m6_l, radians(0), sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m6_r, radians(0), sim.simx_opmode_blocking)
+
+    def get_arm_dimensions(self):
+        # Dimensiones de los brazos (ejemplo)
+        # H = 0.2  # altura de base mm LINK0
+        # b = 0.3  # longitud de brazo m  LINK1
+        # ab = 0.16  # longitud de antebrazo  LINK2
+        # m = 0.24  # longitud de muñequilla m LINK3+LINK4+PINZA - dimension hasta el dummy de la pinza
+
+        # Dimensiones de los brazos (coppelia nuestro)
+        H = 0.07 + 0.07  # altura base + altura eje central
+        ab = 0.1
+        b = 0.1
+        m = 0.05 + 0.07  # muñeca + pinza
+        return H, ab, b, m
+
+class MovementModuleReal(MovementModuleSim):
+    def __init__(self):
+        import board
+        from adafruit_motor import servo
+        from adafruit_pca9685 import PCA9685
+        i2c = board.I2C()
+        pca = PCA9685(i2c)
+        pca.frequency = 50
+
+        # init all servos
+        self.servos = []
+        # for i in range(16):
+        #     self.servos.append( servo.Servo(pca.channels[i]))
+
+        self.servos.append(servo.Servo(pca.channels[0]))
+        self.servos.append(servo.Servo(pca.channels[3]))
+        self.servos.append(servo.Servo(pca.channels[6]))
+        self.servos.append(servo.Servo(pca.channels[9]))
+        self.servos.append(servo.Servo(pca.channels[12]))
+        self.servos.append(servo.Servo(pca.channels[15]))
+
+    def open_claw(self):
+        self.SetServoTargetDegrees(5, 30)
+        self.SetServoTargetDegrees(6, 30)
+
+    def close_claw(self):
+        self.SetServoTargetDegrees(5, 0)
+        self.SetServoTargetDegrees(6, 0)
+
+    def move_joint(self, joint_id, target):
+        # pasar de radianes a grados
+        target = target / np.pi
+
+        self.servos[joint_id].angle = target
+        time.sleep(1)
+
+    def get_arm_dimensions(self):
+        return 0,0,0,0 # TODO: Medir el robot
 
 if __name__ == '__main__':
-    movement = MovementModule()
+    movement = MovementModuleSim()
     movement.reset()
     time.sleep(1)
     # movement.open_claw()
