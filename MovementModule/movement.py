@@ -1,5 +1,5 @@
 """
-Programa de prueba: mover todos los motores del brazo en coppelia. Abrir y cerrar pinza. Falta inverse kinematics!!!
+Modulo para controlar el brazo.
 """
 import numpy as np
 
@@ -155,7 +155,7 @@ class MovementModuleSim(MovementModule):
         m = 0.05 + 0.07  # muñeca + pinza
         return H, ab, b, m
 
-class MovementModuleReal(MovementModuleSim):
+class MovementModuleReal(MovementModule):
     def __init__(self):
         import board
         from adafruit_motor import servo
@@ -177,25 +177,36 @@ class MovementModuleReal(MovementModuleSim):
         self.servos.append(servo.Servo(pca.channels[15]))
 
     def open_claw(self):
-        self.SetServoTargetDegrees(5, 30)
-        self.SetServoTargetDegrees(6, 30)
+        self.servos[5].angle = 90
 
     def close_claw(self):
-        self.SetServoTargetDegrees(5, 0)
-        self.SetServoTargetDegrees(6, 0)
+        self.servos[5].angle = 62
 
     def move_joint(self, joint_id, target):
         # pasar de radianes a grados
-        target = target / np.pi
+        #target = target / np.pi
 
         self.servos[joint_id].angle = target
         time.sleep(1)
 
+    def reset(self):
+        self.servos[0].angle = 0
+        self.servos[1].angle = 0
+        self.servos[2].angle = 0
+        self.servos[3].angle = 0
+        self.servos[4].angle = 0
+#        self.servos[5].angle = 0
+
     def get_arm_dimensions(self):
-        return 0,0,0,0 # TODO: Medir el robot
+        # Dimensiones de los brazos (coppelia nuestro)
+        H = 0.13
+        ab = 0.125
+        b = 0.13
+        m = 0.13
+        return H, ab, b, m
 
 if __name__ == '__main__':
-    movement = MovementModuleSim()
+    movement = MovementModuleReal()
     movement.reset()
     time.sleep(1)
     # movement.open_claw()
@@ -205,8 +216,14 @@ if __name__ == '__main__':
     # movement.move_arm_to_position(0.3,0,0.520)
     # movement.move_arm_to_position(-0.22,0,0.15)
 
-    # movement.reset()
-    movement.move_arm_to_position(-0.3, 0, 0.10)
+    movement.reset()
+#    time.sleep(2)
+#    movement.move_arm_to_position(-0.2, 0, 0.10)
+# movement.move_joint(4, 90)
+#    movement.open_claw()
+#    time.sleep(5)
+#    movement.close_claw()
+#    movement.move_joint(4, 180)
 
 
 
