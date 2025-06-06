@@ -134,8 +134,8 @@ class MovementModuleSim(MovementModule):
         sim.simxSetJointTargetPosition(self.clientID, self.joints[joint_id - 1], target, sim.simx_opmode_blocking)
 
     def open_claw(self):
-        sim.simxSetJointTargetPosition(self.clientID, self.m6_l, radians(30), sim.simx_opmode_blocking)
-        sim.simxSetJointTargetPosition(self.clientID, self.m6_r, radians(-30), sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m6_l, radians(60), sim.simx_opmode_blocking)
+        sim.simxSetJointTargetPosition(self.clientID, self.m6_r, radians(-60), sim.simx_opmode_blocking)
 
     def close_claw(self):
         sim.simxSetJointTargetPosition(self.clientID, self.m6_l, radians(0), sim.simx_opmode_blocking)
@@ -154,6 +154,41 @@ class MovementModuleSim(MovementModule):
         b = 0.1
         m = 0.05 + 0.07  # muñeca + pinza
         return H, ab, b, m
+
+    def stick_object(self, objectName: str):
+        """
+        hacer que la pieza se quede agarrada a la pinza
+        """
+        import sim
+        clientID = self.clientID
+        _, holder = sim.simxGetObjectHandle(clientID, 'Pinza_R_Simple', sim.simx_opmode_blocking)
+        _, obj = sim.simxGetObjectHandle(clientID, objectName, sim.simx_opmode_blocking)
+        # res, cuboid = sim.simxGetObjectHandle(clientID, 'Cuboid', sim.simx_opmode_blocking)
+        sim.simxSetObjectParent(clientID, obj, holder, True, sim.simx_opmode_blocking)
+        # sim.setObjectInt32Parameter(clientID, cuboid, sim.shapeintparam_static, 1)
+        sim.simxSetObjectIntParameter(clientID, obj, sim.sim_shapeintparam_static, 1, sim.simx_opmode_blocking)
+        return
+
+    def unstick_object(self, objectName: str):
+        """
+        hacer que la pieza ya no esté agarrada a la pinza
+        """
+        import sim
+        clientID = self.clientID
+        # _, holder = sim.simxGetObjectHandle(clientID, 'Pinza_R_Simple', sim.simx_opmode_blocking)
+        _, obj = sim.simxGetObjectHandle(clientID, objectName, sim.simx_opmode_blocking)
+        # res, cuboid = sim.simxGetObjectHandle(clientID, 'Cuboid', sim.simx_opmode_blocking)
+        sim.simxSetObjectParent(clientID, obj, -1, True, sim.simx_opmode_blocking)
+        # sim.setObjectInt32Parameter(clientID, cuboid, sim.shapeintparam_static, 1)
+        sim.simxSetObjectIntParameter(clientID, obj, sim.sim_shapeintparam_static, 0, sim.simx_opmode_blocking)
+        return
+
+    def rotate_90(self):
+        """
+        la pinza tiene un objeto agarrado. usa la base y la muñeca para que el objeto quede en la misma posicion pero rotado 90 grados
+        """
+        # self.move_joint(4,90)
+
 
 class MovementModuleReal(MovementModule):
     def __init__(self):
@@ -206,7 +241,7 @@ class MovementModuleReal(MovementModule):
         return H, ab, b, m
 
 if __name__ == '__main__':
-    movement = MovementModuleReal()
+    movement = MovementModuleSim()
     movement.reset()
     time.sleep(1)
     # movement.open_claw()
@@ -218,7 +253,13 @@ if __name__ == '__main__':
 
     movement.reset()
 #    time.sleep(2)
-#    movement.move_arm_to_position(-0.2, 0, 0.10)
+    movement.open_claw()
+    movement.move_arm_to_position(-0.2, 0, 0.07)
+    # time.sleep(1)
+    movement.stick_object("pieza")
+    # movement.move_arm_to_position(0.2, 0.0, 0.07)
+    # movement.unstick_object("pieza")
+    # movement.rotate_90()
 # movement.move_joint(4, 90)
 #    movement.open_claw()
 #    time.sleep(5)
