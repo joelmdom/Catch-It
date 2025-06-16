@@ -31,17 +31,11 @@ class MovementModule:
     def get_arm_dimensions(self):
         return 0,0,0,0
 
-
-    def move_arm_to_position(self,x,y,z):
-        """
-        Inverse kinematic movement. Adaptado de sessió 12.
-        funciona tanto para coppelia como para motores reales si usamos la clase correcta
-        """
+    def inverse_kinematics(self, x,y,z):
         import numpy as np
         import math
 
         H, ab, b, m = self.get_arm_dimensions()  # sera distinto depende si usamos la clase de sim o real
-
 
         # Colocamos cabeceo y giro de la pinza a 0 grados inicialmente
         cabGrados = 0  # cabeceo de la pinza Joint3
@@ -74,6 +68,15 @@ class MovementModule:
         j5 = Axis5  # joint5  Se ha dado en grados inicialmente
         # print(j1, j2, j3, j4, j5)
 
+        return j1, j2, j3, j4, j5
+
+    def move_arm_to_position(self,x,y,z):
+        """
+        Inverse kinematic movement. Adaptado de sessió 12.
+        funciona tanto para coppelia como para motores reales si usamos la clase correcta
+        """
+        j1, j2, j3, j4, j5 = self.inverse_kinematics(x,y,z)
+
         print(f"Joint 1 at {j1} degrees")
         print(f"Joint 2 at {j2} degrees")
         print(f"Joint 3 at {j3} degrees")
@@ -85,6 +88,33 @@ class MovementModule:
 
         # alerta: nuestro joint 4 y 5 estan en el orden invertido respecto al ejemplo.
         self.move_joint(5, j4 * np.pi / 180)
+        time.sleep(1)
+        self.move_joint(4, j5 * np.pi / 180)
+        time.sleep(1)
+
+        self.move_joint(3, j3 * np.pi / 180)
+        time.sleep(1)
+        self.move_joint(2, j2 * np.pi / 180)
+        time.sleep(1)
+
+    def move_arm_to_position_sin_muneca(self,x,y,z):
+        """
+        Inverse kinematic movement. Adaptado de sessió 12.
+        funciona tanto para coppelia como para motores reales si usamos la clase correcta
+        """
+        j1, j2, j3, j4, j5 = self.inverse_kinematics(x,y,z)
+
+        print(f"Joint 1 at {j1} degrees")
+        print(f"Joint 2 at {j2} degrees")
+        print(f"Joint 3 at {j3} degrees")
+        print(f"Joint 4 at {j4} degrees")
+        print(f"Joint 5 at {j5} degrees")
+
+        self.move_joint(1, j1 * np.pi / 180)
+        time.sleep(1)
+
+        # alerta: nuestro joint 4 y 5 estan en el orden invertido respecto al ejemplo.
+        # self.move_joint(5, j4 * np.pi / 180)
         time.sleep(1)
         self.move_joint(4, j5 * np.pi / 180)
         time.sleep(1)
@@ -169,6 +199,20 @@ class MovementModuleSim(MovementModule):
         sim.simxSetObjectIntParameter(clientID, obj, sim.sim_shapeintparam_static, 1, sim.simx_opmode_blocking)
         return
 
+    def stick_object_ref(self, obj):
+        """
+        hacer que la pieza se quede agarrada a la pinza
+        """
+        import sim
+        clientID = self.clientID
+        _, holder = sim.simxGetObjectHandle(clientID, 'Pinza_R_Simple', sim.simx_opmode_blocking)
+        # _, obj = sim.simxGetObjectHandle(clientID, objectName, sim.simx_opmode_blocking)
+        # res, cuboid = sim.simxGetObjectHandle(clientID, 'Cuboid', sim.simx_opmode_blocking)
+        sim.simxSetObjectParent(clientID, obj, holder, True, sim.simx_opmode_blocking)
+        # sim.setObjectInt32Parameter(clientID, cuboid, sim.shapeintparam_static, 1)
+        sim.simxSetObjectIntParameter(clientID, obj, sim.sim_shapeintparam_static, 1, sim.simx_opmode_blocking)
+        return
+
     def unstick_object(self, objectName: str):
         """
         hacer que la pieza ya no esté agarrada a la pinza
@@ -182,12 +226,89 @@ class MovementModuleSim(MovementModule):
         # sim.setObjectInt32Parameter(clientID, cuboid, sim.shapeintparam_static, 1)
         sim.simxSetObjectIntParameter(clientID, obj, sim.sim_shapeintparam_static, 0, sim.simx_opmode_blocking)
         return
+    def unstick_object_ref(self, obj):
+        """
+        hacer que la pieza ya no esté agarrada a la pinza
+        """
+        import sim
+        clientID = self.clientID
+        # _, holder = sim.simxGetObjectHandle(clientID, 'Pinza_R_Simple', sim.simx_opmode_blocking)
+        # _, obj = sim.simxGetObjectHandle(clientID, objectName, sim.simx_opmode_blocking)
+        # res, cuboid = sim.simxGetObjectHandle(clientID, 'Cuboid', sim.simx_opmode_blocking)
+        sim.simxSetObjectParent(clientID, obj, -1, True, sim.simx_opmode_blocking)
+        # sim.setObjectInt32Parameter(clientID, cuboid, sim.shapeintparam_static, 1)
+        sim.simxSetObjectIntParameter(clientID, obj, sim.sim_shapeintparam_static, 0, sim.simx_opmode_blocking)
+        return
 
-    def rotate_90(self):
+
+    def spawn_jenga_block(self, x, y, z, orientation_gamma):
+        # copy paste block
+        _, block = sim.simxGetObjectHandle(self.clientID, "pieza", sim.simx_opmode_blocking)
+        # print(block)
+        _, ret = sim.simxCopyPasteObjects(self.clientID, [block], sim.simx_opmode_blocking)
+        # print(block)
+        block = ret[0]
+        sim.simxSetObjectOrientation(self.clientID, block, block, [0,0,radians(orientation_gamma)], sim.simx_opmode_blocking)
+        sim.simxSetObjectPosition(self.clientID, block, -1, [x, y, z], sim.simx_opmode_blocking)
+        return block
+
+    def wait_for_block(self, orientation_gamma):
         """
-        la pinza tiene un objeto agarrado. usa la base y la muñeca para que el objeto quede en la misma posicion pero rotado 90 grados
+        In coppelia sim we spawn the object instead of waiting. In real life we check with computer vision if the block
+        is placed in the correct position and rotation.
         """
-        # self.move_joint(4,90)
+        b = self.spawn_jenga_block(-0.2,0.0,0.025, orientation_gamma)
+        time.sleep(2)
+        return b
+
+    def pick_and_place(self, x_dest, y_dest, z_dest, orientation_gamma):
+        self.reset()
+        H, ab, b, m = self.get_arm_dimensions()
+
+        # Pick
+        movement.open_claw()
+        block = movement.wait_for_block(orientation_gamma)
+        movement.move_arm_to_position(-0.2, 0, 0.07)
+        time.sleep(1)
+        movement.stick_object_ref(block)
+
+        # Place
+        movement.reset()
+        movement.open_claw()
+        movement.move_arm_to_position(x_dest, y_dest, z_dest)
+        movement.unstick_object_ref(block)
+
+
+    def build_tower_level_odd(self, x,y,z):
+        # self.spawn_jenga_block(x-0.03, y , z, 90)
+        # self.spawn_jenga_block(x+0.00, y, z, 90)
+        # self.spawn_jenga_block(x+0.03, y, z, 90)]
+        self.pick_and_place(x - 0.03, y, z, 90)
+        self.pick_and_place(x + 0.00, y, z, 90)
+        self.pick_and_place(x + 0.03, y, z, 90)
+        pass
+
+    def build_tower_level_even(self, x,y,z):
+        self.build_tower_level_odd(x,y,z) # de momento solo horizontal
+        # self.pick_and_place(x, y-0.03, z, 0)
+        # self.pick_and_place(x, y+0.00, z, 0)
+        # self.pick_and_place(x, y+0.03, z, 0)
+        pass
+
+    def build_tower(self, n_blocks, center):
+        levels = n_blocks / 3
+        levels = int(levels)
+        print(levels)
+        x,y,z = center
+        z += 0.1 # para dejarla caer un poco y desequilibrar
+
+        for level in range(levels):
+            # self.build_tower_level_even(x, y, z)
+            if level % 2 == 0:
+                self.build_tower_level_even(x,y,z)
+            else:
+                self.build_tower_level_odd(x,y,z)
+            z += 0.015
 
 
 class MovementModuleReal(MovementModule):
@@ -242,8 +363,12 @@ class MovementModuleReal(MovementModule):
 
 if __name__ == '__main__':
     movement = MovementModuleSim()
-    movement.reset()
-    time.sleep(1)
+
+    movement.build_tower(12, [0.2, 0.0, 0.07])
+
+# lo dejo aqui por si acaso
+    # movement.reset()
+    # time.sleep(1)
     # movement.open_claw()
     # time.sleep(1)
     # movement.close_claw()
@@ -251,20 +376,36 @@ if __name__ == '__main__':
     # movement.move_arm_to_position(0.3,0,0.520)
     # movement.move_arm_to_position(-0.22,0,0.15)
 
-    movement.reset()
+    # H, ab, b, m = movement.get_arm_dimensions()
+
+    # movement.reset()
 #    time.sleep(2)
-    movement.open_claw()
-    movement.move_arm_to_position(-0.2, 0, 0.07)
-    # time.sleep(1)
-    movement.stick_object("pieza")
-    # movement.move_arm_to_position(0.2, 0.0, 0.07)
-    # movement.unstick_object("pieza")
+#     movement.open_claw()
+#     block = movement.wait_for_block(True)
+#     movement.move_arm_to_position(-0.2, 0, 0.07)
+#     time.sleep(1)
+#     movement.stick_object_ref(block)
+#
+#     movement.reset()
+#     movement.open_claw()
+#     movement.move_arm_to_position(0.2, 0.0, 0.07)
+#     movement.unstick_object_ref(block)
     # movement.rotate_90()
 # movement.move_joint(4, 90)
 #    movement.open_claw()
 #    time.sleep(5)
 #    movement.close_claw()
 #    movement.move_joint(4, 180)
+#     movement.move_joint(2,-30 * np.pi / 180)
+#     movement.move_joint(3,-135 * np.pi / 180)
+    # movement.open_claw()
+    # movement.reset()
+    # time.sleep(1)
+
+    # movement.move_joint(4,90)
+
+    # movement.move_arm_to_position_sin_muneca(-0.25, -0.1, 0.07)
+
 
 
 
