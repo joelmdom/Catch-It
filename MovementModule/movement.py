@@ -277,6 +277,7 @@ class MovementModuleSim(MovementModule):
         movement.open_claw()
         movement.move_arm_to_position(x_dest, y_dest, z_dest)
         movement.unstick_object_ref(block)
+        time.sleep(1)
 
 
     def build_tower_level_odd(self, x,y,z):
@@ -289,10 +290,12 @@ class MovementModuleSim(MovementModule):
         pass
 
     def build_tower_level_even(self, x,y,z):
-        self.build_tower_level_odd(x,y,z) # de momento solo horizontal
         # self.pick_and_place(x, y-0.03, z, 0)
         # self.pick_and_place(x, y+0.00, z, 0)
         # self.pick_and_place(x, y+0.03, z, 0)
+        self.pick_and_place(x, y - 0.032, z, 0)
+        self.pick_and_place(x, y + 0.000, z, 0)
+        self.pick_and_place(x, y + 0.032, z, 0)
         pass
 
     def build_tower(self, n_blocks, center):
@@ -300,7 +303,8 @@ class MovementModuleSim(MovementModule):
         levels = int(levels)
         print(levels)
         x,y,z = center
-        z += 0.1 # para dejarla caer un poco y desequilibrar
+        # z += 0.1 # para dejarla caer un poco y desequilibrar
+        # z += 0.07 # para dejarla caer un poco y desequilibrar
 
         for level in range(levels):
             # self.build_tower_level_even(x, y, z)
@@ -308,7 +312,7 @@ class MovementModuleSim(MovementModule):
                 self.build_tower_level_even(x,y,z)
             else:
                 self.build_tower_level_odd(x,y,z)
-            z += 0.015
+            z += 0.033
 
 
 class MovementModuleReal(MovementModule):
@@ -364,7 +368,7 @@ class MovementModuleReal(MovementModule):
 if __name__ == '__main__':
     movement = MovementModuleSim()
 
-    movement.build_tower(12, [0.2, 0.0, 0.07])
+    movement.build_tower(99, [0.2, 0.0, 0.07])
 
 # lo dejo aqui por si acaso
     # movement.reset()
