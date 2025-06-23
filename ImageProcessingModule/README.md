@@ -16,7 +16,7 @@ En el módulo de procesamiento de imagen, se encuentran los siguientes ficheros:
 ## Detección de posiciones
 
 **execute_project.py**: Ejecuta la detección de posición, importando los siguientes ficheros:
-
+- **cameraCalibration.py**: Calibración de la cámara para evitar distorsiones.
 - **selectCorners.py**: Seleccionar los tres puntos del marco.
 - **depthMap.py**: Ejecuta MiDaS para generar el mapa de profundidad.
 - **LUT_real_to_simulated.py**: Preprocesa las imágenes mediante transformada de Reinhard para asemejarlas a las imágenes simuladas.
