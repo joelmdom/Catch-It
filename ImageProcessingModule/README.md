@@ -33,6 +33,6 @@ A una imagen real con detección mediante YOLO:
 
 ![image](https://github.com/user-attachments/assets/84c5aa96-c6b5-424f-8621-bda54f4f6bcc)
 
-A, finalmente, una matriz de posiciones detectadas. 
+A, finalmente, una matriz de posiciones y orientaciones detectadas.
 
-TO DO
+<video src="https://youtu.be/M_Vc1ADkZt0"></video>
