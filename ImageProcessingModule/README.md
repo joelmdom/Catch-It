@@ -15,7 +15,14 @@ En el módulo de procesamiento de imagen, se encuentran los siguientes ficheros:
 
 ## Detección de posiciones
 
-# TO DO
+**execute_project.py**: Ejecuta la detección de posición, importando los siguientes ficheros:
+
+- **selectCorners.py**: Seleccionar los tres puntos del marco.
+- **depthMap.py**: Ejecuta MiDaS para generar el mapa de profundidad.
+- **LUT_real_to_simulated.py**: Preprocesa las imágenes mediante transformada de Reinhard para asemejarlas a las imágenes simuladas.
+- **getCoordinates.py**: Devuelve coordenadas reales a partir de la imagen.
+- **pieza_individual.py**: Detecta el plano de la cara de la pieza.
+- **gradosPieza.py**: Calcula intersección entre los planos del fondo y de la pieza para devolver la orientación.
 
 ## Útiles
 - **yolov8n.pt**
@@ -33,6 +40,6 @@ A una imagen real con detección mediante YOLO:
 
 ![image](https://github.com/user-attachments/assets/84c5aa96-c6b5-424f-8621-bda54f4f6bcc)
 
-A, finalmente, una matriz de posiciones y orientaciones detectadas.
+A, finalmente, una matriz de posiciones y orientaciones detectadas. El proceso final termina siendo así:
 
-<video src="https://youtu.be/M_Vc1ADkZt0"></video>
+![DemoVC](https://github.com/user-attachments/assets/a2b6ef13-378e-4f7f-bd40-97c9095b6ff8)
