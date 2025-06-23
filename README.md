@@ -39,7 +39,8 @@ En el directorio destinado al programa, compilar y ejecutar:
 El modelo 3D del brazo robótico no nos pertenece, lo puedes conseguir en el siguiente link: https://cults3d.com/es/modelo-3d/artilugios/brazo-robotico-arduino-diy-con-control-de-smartphone-2023
 
 ## Arquitectura hardware
-[Schematic_RLP_CatchIt.pdf](https://github.com/user-attachments/files/20863501/Schematic_RLP_CatchIt.pdf)
+![Schematic_RLP_CatchIt](https://github.com/user-attachments/assets/83c8dc36-ed23-4169-a5e3-813045c7e362)
+
 
 
 ### Componentes
