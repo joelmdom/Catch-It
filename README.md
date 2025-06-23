@@ -2,14 +2,14 @@
 
 ## Índice
 
-- [Descripción del proyecto](#descripcion-del-proyecto)
-- [Instalación](#instalacion)
-- [Funcionamiento y demostración](#funcionamiento-y-demostracion)
+- [Descripción del proyecto](#descripción-del-proyecto)
+- [Instalación](#instalación)
+- [Funcionamiento y demostración](#funcionamiento-y-demostración)
 - [Piezas 3D](#piezas-3d)
 - [Arquitectura hardware](#arquitectura-hardware)
      - [Componentes](#componentes)
 - [Arquitectura software](#arquitectura-software)
-     - [Descripción de los módulos](#descripcion-de-los-modulos)
+     - [Descripción de los módulos](#descripción-de-los-módulos)
 - [Bibliografía](#bibliografía)
 - [Autores](#autores)
 - [Licencia](#licencia)
