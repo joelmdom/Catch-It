@@ -94,18 +94,18 @@ class MovementModule:
             j5 = j5 * np.pi / 180
 
         self.move_joint(1, j1)
-        time.sleep(1)
+        time.sleep(2)
 
         # alerta: nuestro joint 4 y 5 estan en el orden invertido respecto al robot de ejemplo.
         self.move_joint(5, j4)
-        time.sleep(1)
+        time.sleep(2)
         #self.move_joint(4, j5)
-        time.sleep(1)
+        time.sleep(2)
 
         self.move_joint(3, j3)
-        time.sleep(1)
+        time.sleep(2)
         self.move_joint(2, j2)
-        time.sleep(1)
+        time.sleep(2)
 
     def move_arm_to_position_sin_muneca(self,x,y,z):
         """
@@ -146,7 +146,7 @@ class MovementModule:
         self.pick_and_place(x, y + 0.032, z, 0)
         pass
 
-    def build_tower(self, n_blocks, center):
+    def build_tower_jenga(self, n_blocks, center):
         levels = n_blocks / 3
         levels = int(levels)
         print(levels)
@@ -154,19 +154,34 @@ class MovementModule:
         # z += 0.1 # para dejarla caer un poco y desequilibrar
         # z += 0.07 # para dejarla caer un poco y desequilibrar
         for level in range(levels):
-            # self.build_tower_level_even(x, y, z)
             if level % 2 == 0:
                 self.build_tower_level_even(x, y, z)
             else:
                 self.build_tower_level_odd(x, y, z)
             z += 0.033
 
+    def build_tower_horizontal(self, n_blocks, center):
+        levels = n_blocks / 3
+        levels = int(levels)
+        print(levels)
+        x, y, z = center
+        # z += 0.1 # para dejarla caer un poco y desequilibrar
+        # z += 0.07 # para dejarla caer un poco y desequilibrar
+        for level in range(levels):
+            self.build_tower_level_odd(x, y, z)
+            z += 0.033
+
+
     def wait_for_block(self, orientation_gamma):
         """
         In coppelia sim we spawn the object instead of waiting. In real life we check with computer vision if the block
         is placed in the correct position and rotation.
         """
-        time.sleep(5)
+        print("Waiting for block")
+        if orientation_gamma == 90: print("horizontal")
+        else: print("vertical")
+
+        time.sleep(2)
 
     def pick_and_place(self, x, y, z, angle):
         pass
@@ -338,7 +353,7 @@ class MovementModuleReal(MovementModule):
         from adafruit_pca9685 import PCA9685
         i2c = board.I2C()
         pca = PCA9685(i2c)
-        pca.frequency = 50
+        pca.frequency = 240
 
         self.use_radians = False
 
@@ -360,9 +375,13 @@ class MovementModuleReal(MovementModule):
 
     def open_claw(self):
         self.servos[5].angle = 90
+        #self.servos[5].angle = 80
 
     def close_claw(self):
-        self.servos[5].angle = 30
+        self.servos[5].angle = 8
+
+    def close_claw_horizontal(self):
+        self.servos[5].angle = 68
 
     def move_joint(self, joint_id, target):
 
@@ -408,11 +427,17 @@ class MovementModuleReal(MovementModule):
 
 
     def reset(self):
-        self.servos[0].angle = self.offsets[0]
+
         self.servos[1].angle = self.offsets[1]
-        self.servos[2].angle = self.offsets[2]
+        time.sleep(2)
+        self.servos[2].angle = self.offsets[2]+5
+        time.sleep(2)
         self.servos[3].angle = self.offsets[3]
+        time.sleep(2)
         self.servos[4].angle = self.offsets[4]
+        time.sleep(2)
+        self.servos[0].angle = self.offsets[0]
+        time.sleep(2)
 
     def get_arm_dimensions(self):
         # Dimensiones de los brazos (coppelia nuestro)
@@ -438,21 +463,39 @@ class MovementModuleReal(MovementModule):
         self.open_claw()
         # TODO: esperar a que el usuario coloque la pieza en la pos y orientacion correcta
         block = self.wait_for_block(orientation_gamma)
-        self.move_arm_to_position(-0.2, 0, 0.07)
+        #self.move_arm_to_position(-0.2, 0, 0.10)
+        self.move_arm_to_position(-0.2, 0, 0.11)
+
         time.sleep(1)
 
         # TODO: cerrar garra mas o menos dependiendo de si la pieza esta en vertical o horizontal
         # self.stick_object_ref(block)
-        self.close_claw()
+        if orientation_gamma == 90:
+            self.close_claw_horizontal()
+        else:
+            self.close_claw()
+
+        time.sleep(3)
 
         # Place
-        self.reset()
-        self.open_claw()
+        #self.reset()
+        self.move_joint(2, 0)
+        #self.open_claw()
+        time.sleep(2)
         self.move_arm_to_position(x_dest, y_dest, z_dest)
         time.sleep(2)
         self.open_claw()
         # self.unstick_object_ref(block)
         time.sleep(1)
+
+    @override
+    def build_tower_level_odd(self, x, y, z):
+        # en la vida real le damos un poco mas de margen que en el coppelia para que no choque
+        self.pick_and_place(x - 0.031, y, z, 90)
+        self.pick_and_place(x + 0.000, y, z, 90)
+        self.pick_and_place(x + 0.031, y, z, 90)
+        return
+
 
 if __name__ == '__main__':
     # movement = MovementModuleSim()
@@ -464,7 +507,8 @@ if __name__ == '__main__':
 #    time.sleep(2)
 #    movement.move_joint(1,180)
 
-    movement.build_tower(9, [0.2, 0.0, 0.07])
+    movement.build_tower_horizontal(9, [0.2, 0.0, 0.105])
+
 #    movement.reset()
 #    time.sleep(2)
 #    movement.move_arm_to_position(0.2, 0.0, 0.1)
@@ -474,11 +518,27 @@ if __name__ == '__main__':
 #    time.sleep(2)
 #    movement.reset()
 
+    print("open")
+
+    movement.open_claw()
+
+    time.sleep(5)
+
+    print("close")
+
+    movement.close_claw_horizontal()
+
+    time.sleep(2)
+
+    movement.move_joint(2,90)
+
 #    movement.open_claw()
 
 #    time.sleep(2)
 
-#    movement.close_claw()
+#    movement.close_claw_horizontal()
+
+#    time.sleep(2)
 #    movement.move_joint(4,0)
 
 #    time.sleep(2)
