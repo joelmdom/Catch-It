@@ -3,11 +3,11 @@ Modulo para controlar el brazo.
 """
 import numpy as np
 
-import sim
+#import sim
 import time
 from math import radians
 
-from coppelia_functions import *
+#from coppelia_functions import *
 
 class MovementModule:
     def __init__(self):
@@ -336,6 +336,10 @@ class MovementModuleReal(MovementModule):
         self.servos.append(servo.Servo(pca.channels[12]))
         self.servos.append(servo.Servo(pca.channels[15]))
 
+        # servo calibration
+        self.offsets = [0,90,45,0,90]
+        self.corrected_directions = [1,-1,1,-1,-1,1] # -1 if it is the opposite direction in coppelia
+
     def open_claw(self):
         self.servos[5].angle = 90
 
@@ -345,17 +349,38 @@ class MovementModuleReal(MovementModule):
     def move_joint(self, joint_id, target):
         # pasar de radianes a grados
         #target = target / np.pi
-
+        print(f" target: {target}")
+        target = target * self.corrected_directions[joint_id]
+        target = target + self.offsets[joint_id]
+        print(f" target corrected: {target}")
         self.servos[joint_id].angle = target
         time.sleep(1)
+#        move_joint_slow(joint_id, target)
+#        time.sleep(2)
+
+    def move_joint_slow(self, joint_id, target):
+        target = target * self.corrected_directions[joint_id]
+        target = target + self.offsets[joint_id]
+        #curr = target + self.offsets[joint_id]
+        prev = self.offsets[joint_id]
+        curr = prev
+        print(f" target: {target}    curr: {curr}    prev: {prev}")
+        if target < prev:
+            step = -1
+        else:
+            step = 1
+        for i in range(0, abs(target-prev)):
+            curr += step
+            self.servos[joint_id].angle = curr
+            time.sleep(0.1)
+
 
     def reset(self):
-        self.servos[0].angle = 0
-        self.servos[1].angle = 0
-        self.servos[2].angle = 0
-        self.servos[3].angle = 0
-        self.servos[4].angle = 0
-#        self.servos[5].angle = 0
+        self.servos[0].angle = self.offsets[0]
+        self.servos[1].angle = self.offsets[1]
+        self.servos[2].angle = self.offsets[2]
+        self.servos[3].angle = self.offsets[3]
+        self.servos[4].angle = self.offsets[4]
 
     def get_arm_dimensions(self):
         # Dimensiones de los brazos (coppelia nuestro)
@@ -366,9 +391,19 @@ class MovementModuleReal(MovementModule):
         return H, ab, b, m
 
 if __name__ == '__main__':
-    movement = MovementModuleSim()
+    # movement = MovementModuleSim()
+    movement = MovementModuleReal()
 
-    movement.build_tower(99, [0.2, 0.0, 0.07])
+    # movement.build_tower(99, [0.2, 0.0, 0.07])
+    #movement.reset()
+    movement.move_joint(4,0)
+    time.sleep(4)
+    movement.move_joint(4,90)
+#    movement.move_joint_slow(0,0)
+#    movement.move_joint_slow(1,90)
+#    movement.move_joint_slow(2, 45)
+#    movement.move_joint_slow(3, 0)
+#    movement.move_joint_slow(4, 90)
 
 # lo dejo aqui por si acaso
     # movement.reset()
@@ -409,6 +444,7 @@ if __name__ == '__main__':
     # movement.move_joint(4,90)
 
     # movement.move_arm_to_position_sin_muneca(-0.25, -0.1, 0.07)
+
 
 
 
