@@ -83,18 +83,25 @@ class MovementModule:
         print(f"Joint 4 at {j4} degrees")
         print(f"Joint 5 at {j5} degrees")
 
-        self.move_joint(1, j1 * np.pi / 180)
+        if self.use_radians:
+            j1 = j1 * np.pi / 180
+            j2 = j2 * np.pi / 180
+            j3 = j3 * np.pi / 180
+            j4 = j4 * np.pi / 180
+            j5 = j5 * np.pi / 180
+
+        self.move_joint(1, j1)
         time.sleep(1)
 
-        # alerta: nuestro joint 4 y 5 estan en el orden invertido respecto al ejemplo.
-        self.move_joint(5, j4 * np.pi / 180)
+        # alerta: nuestro joint 4 y 5 estan en el orden invertido respecto al robot de ejemplo.
+        #self.move_joint(5, j4)
         time.sleep(1)
-        self.move_joint(4, j5 * np.pi / 180)
+        #self.move_joint(4, j5)
         time.sleep(1)
 
-        self.move_joint(3, j3 * np.pi / 180)
+        self.move_joint(3, j3)
         time.sleep(1)
-        self.move_joint(2, j2 * np.pi / 180)
+        self.move_joint(2, j2)
         time.sleep(1)
 
     def move_arm_to_position_sin_muneca(self,x,y,z):
@@ -132,6 +139,8 @@ class MovementModuleSim(MovementModule):
         # conectar a coppelia
         self.clientID = coppelia_connect(19999)
         # print(self.clientID)
+
+        self.use_radians = True
 
         # get all servomotors
         retCode, self.m1 = sim.simxGetObjectHandle(self.clientID, 'joint1', sim.simx_opmode_blocking)
@@ -324,6 +333,8 @@ class MovementModuleReal(MovementModule):
         pca = PCA9685(i2c)
         pca.frequency = 50
 
+        self.use_radians = False
+
         # init all servos
         self.servos = []
         # for i in range(16):
@@ -347,8 +358,8 @@ class MovementModuleReal(MovementModule):
         self.servos[5].angle = 62
 
     def move_joint(self, joint_id, target):
-        # pasar de radianes a grados
-        #target = target / np.pi
+        joint_id = joint_id-1
+        print(f"joint id: {joint_id}")
         print(f" target: {target}")
         target = target * self.corrected_directions[joint_id]
         target = target + self.offsets[joint_id]
@@ -359,6 +370,7 @@ class MovementModuleReal(MovementModule):
 #        time.sleep(2)
 
     def move_joint_slow(self, joint_id, target):
+        joint_id = joint_id-1
         target = target * self.corrected_directions[joint_id]
         target = target + self.offsets[joint_id]
         #curr = target + self.offsets[joint_id]
@@ -383,12 +395,20 @@ class MovementModuleReal(MovementModule):
         self.servos[4].angle = self.offsets[4]
 
     def get_arm_dimensions(self):
-        # Dimensiones de los brazos (coppelia nuestro)
-        H = 0.13
-        ab = 0.125
-        b = 0.13
-        m = 0.13
+
+	# Dimensiones de los brazos (coppelia nuestro)
+        H = 0.07 + 0.07  # altura base + altura eje central
+        ab = 0.1
+        b = 0.1
+        m = 0.05 + 0.07  # muñeca + pinza
         return H, ab, b, m
+
+        # Dimensiones de los brazos (real, no va bien de momento)
+        #H = 0.13
+        #ab = 0.125
+        #b = 0.13
+        #m = 0.13
+        #return H, ab, b, m
 
 if __name__ == '__main__':
     # movement = MovementModuleSim()
@@ -396,9 +416,10 @@ if __name__ == '__main__':
 
     # movement.build_tower(99, [0.2, 0.0, 0.07])
     #movement.reset()
-    movement.move_joint(4,0)
-    time.sleep(4)
-    movement.move_joint(4,90)
+    movement.move_arm_to_position(0.2, 0.1, 0.07)
+#    movement.move_joint(4,0)
+#    time.sleep(4)
+#    movement.move_joint(4,90)
 #    movement.move_joint_slow(0,0)
 #    movement.move_joint_slow(1,90)
 #    movement.move_joint_slow(2, 45)
@@ -444,10 +465,3 @@ if __name__ == '__main__':
     # movement.move_joint(4,90)
 
     # movement.move_arm_to_position_sin_muneca(-0.25, -0.1, 0.07)
-
-
-
-
-
-
-
