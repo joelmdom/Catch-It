@@ -363,7 +363,7 @@ class MovementModuleReal(MovementModule):
         #     self.servos.append( servo.Servo(pca.channels[i]))
 
         self.servos.append(servo.Servo(pca.channels[0]))
-        self.servos.append(servo.Servo(pca.channels[3]))
+        self.servos.append(servo.Servo(pca.channels[4])) #el 3 se ha roto
         self.servos.append(servo.Servo(pca.channels[6]))
         self.servos.append(servo.Servo(pca.channels[9]))
         self.servos.append(servo.Servo(pca.channels[12]))
@@ -507,7 +507,7 @@ if __name__ == '__main__':
 #    time.sleep(2)
 #    movement.move_joint(1,180)
 
-    movement.build_tower_horizontal(9, [0.2, 0.0, 0.105])
+#    movement.build_tower_horizontal(9, [0.2, 0.0, 0.105])
 
 #    movement.reset()
 #    time.sleep(2)
