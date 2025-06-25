@@ -2,15 +2,15 @@
 Modulo para controlar el brazo.
 """
 import numpy as np
-
-#import sim
 import time
 from math import radians
 
 from typing_extensions import override
 
-
-#from coppelia_functions import *
+# Comentar estas dos líneas si se usan motores reales!!!!!!!
+import sim
+from coppelia_functions import *
+# -----------------------
 
 class MovementModule:
     def __init__(self):
@@ -461,14 +461,14 @@ class MovementModuleReal(MovementModule):
 
         # Pick
         self.open_claw()
-        # TODO: esperar a que el usuario coloque la pieza en la pos y orientacion correcta
+        # TODO: esperar a que el usuario coloque la pieza en la pos y orientacion correcta con VC
         block = self.wait_for_block(orientation_gamma)
         #self.move_arm_to_position(-0.2, 0, 0.10)
         self.move_arm_to_position(-0.2, 0, 0.11)
 
         time.sleep(1)
 
-        # TODO: cerrar garra mas o menos dependiendo de si la pieza esta en vertical o horizontal
+        # Cerrar garra mas o menos dependiendo de si la pieza esta en vertical o horizontal
         # self.stick_object_ref(block)
         if orientation_gamma == 90:
             self.close_claw_horizontal()
@@ -498,49 +498,27 @@ class MovementModuleReal(MovementModule):
 
 
 if __name__ == '__main__':
-    # movement = MovementModuleSim()
-    movement = MovementModuleReal()
+    movement = MovementModuleSim()
+    #movement = MovementModuleReal()
+    
     movement.reset()
-#    movement.move_joint(1,0)
-#    time.sleep(2)
-#    movement.move_joint(1,90)
-#    time.sleep(2)
-#    movement.move_joint(1,180)
+    time.sleep(2)
 
-#    movement.build_tower_horizontal(9, [0.2, 0.0, 0.105])
+    # Construcción torre
+    movement.build_tower_horizontal(9, [0.2, 0.0, 0.105])
 
-#    movement.reset()
-#    time.sleep(2)
-#    movement.move_arm_to_position(0.2, 0.0, 0.1)
-#    time.sleep(2)
-#    movement.reset()
-#    movement.move_arm_to_position(0.0, 0.2, 0.1)
-#    time.sleep(2)
-#    movement.reset()
+    # Pruebas motores, etc.
+    movement.reset()
+    time.sleep(2)
+    movement.move_arm_to_position(0.2, 0.0, 0.1)
+    time.sleep(2)
 
     print("open")
-
     movement.open_claw()
-
     time.sleep(5)
 
     print("close")
-
     movement.close_claw_horizontal()
-
     time.sleep(2)
 
     movement.move_joint(2,90)
-
-#    movement.open_claw()
-
-#    time.sleep(2)
-
-#    movement.close_claw_horizontal()
-
-#    time.sleep(2)
-#    movement.move_joint(4,0)
-
-#    time.sleep(2)
-#    movement.move_joint(4,-90)
-#    movement.move_joint(5,-90)
